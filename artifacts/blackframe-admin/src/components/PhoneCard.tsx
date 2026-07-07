@@ -34,8 +34,31 @@ function buildShareText(phone: Phone, price: string): string {
     `✅ ${phone.status}`,
   ];
   if (phone.notes) lines.push(`\n${phone.notes}`);
-  lines.push(`\nContactez-nous sur WhatsApp :\nwa.me/${WHATSAPP_NUMBER}`);
+  lines.push(`\nContactez-nous sur WhatsApp :\nhttps://wa.me/${WHATSAPP_NUMBER}`);
   return lines.join("\n");
+}
+
+// Clipboard with execCommand fallback for HTTP/older browsers
+async function copyToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // fall through to execCommand
+    }
+  }
+  const el = document.createElement("textarea");
+  el.value = text;
+  el.style.cssText = "position:fixed;top:0;left:0;opacity:0;pointer-events:none;";
+  document.body.appendChild(el);
+  el.focus();
+  el.select();
+  try {
+    document.execCommand("copy");
+  } finally {
+    document.body.removeChild(el);
+  }
 }
 
 interface PhoneCardProps {
@@ -66,12 +89,11 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
   };
 
   const handleCopy = async () => {
-    const text = buildShareText(phone, priceStr);
     try {
-      await navigator.clipboard.writeText(text);
-      toast.success("Texte copié dans le presse-papiers");
+      await copyToClipboard(buildShareText(phone, priceStr));
+      toast.success("Texte copié !");
     } catch {
-      toast.error("Impossible de copier — réessayez");
+      toast.error("Impossible de copier");
     }
   };
 
@@ -79,17 +101,13 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
     const text = buildShareText(phone, priceStr);
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: `${phone.model} — ${priceStr}`,
-          text,
-        });
+        await navigator.share({ title: `${phone.model} — ${priceStr}`, text });
+        return;
       } catch {
-        // user cancelled or share failed — fall back to copy
-        handleCopy();
+        // user cancelled or browser blocked — fall through to copy
       }
-    } else {
-      handleCopy();
     }
+    handleCopy();
   };
 
   return (
@@ -103,23 +121,19 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
     >
       <Card className="flex flex-col border-white/5 bg-white/5 shadow-none overflow-hidden">
 
-        {/* Media */}
-        {hasMedia && (
-          <div className="w-full">
-            <MediaSlider media={phone.media} />
-          </div>
-        )}
+        {/* Media slider */}
+        {hasMedia && <MediaSlider media={phone.media} />}
 
-        {/* Main info */}
+        {/* Main content */}
         <div className="p-4 flex flex-col gap-3">
 
-          {/* Header: model + badge */}
+          {/* Model + status */}
           <div className="flex justify-between items-start gap-3">
-            <div className="flex flex-col gap-0.5 min-w-0">
+            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
               <h3 className="font-bold text-lg leading-tight tracking-tight">{phone.model}</h3>
-              <div className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {new Date(phone.purchaseDate + "T00:00:00").toLocaleDateString("fr-FR")}
-              </div>
+              </p>
             </div>
             <Badge
               variant="outline"
@@ -129,8 +143,8 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
             </Badge>
           </div>
 
-          {/* Price — prominent */}
-          <div className="flex items-baseline gap-2">
+          {/* Price — dominant */}
+          <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-3xl font-black tracking-tight text-white">{priceStr}</span>
             {phone.minPrice > 0 && phone.minPrice !== phone.salePrice && (
               <span className="text-xs text-muted-foreground font-medium">
@@ -139,7 +153,7 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
             )}
           </div>
 
-          {/* Notes as short description */}
+          {/* Notes as description */}
           {phone.notes ? (
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
               {phone.notes}
@@ -150,7 +164,7 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
           <button
             type="button"
             onClick={() => setShowDetails(v => !v)}
-            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground transition-colors w-fit"
+            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground/50 hover:text-muted-foreground transition-colors w-fit py-1"
             data-testid={`button-details-${phone.id}`}
           >
             {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -163,28 +177,18 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
+                transition={{ duration: 0.18 }}
+                style={{ overflow: "hidden" }}
               >
-                <div className="grid grid-cols-2 gap-3 text-sm bg-black/30 p-3 rounded-xl border border-white/5">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Coût total</span>
-                    <span className="font-medium text-sm">{formatCurrency(totalCost)}</span>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Bénéfice</span>
-                    <span className={`font-semibold text-sm ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-                      {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Prix achat</span>
-                    <span className="font-medium text-sm text-muted-foreground">{formatCurrency(phone.purchasePrice)}</span>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Réparation</span>
-                    <span className="font-medium text-sm text-muted-foreground">{formatCurrency(phone.repairCost)}</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 bg-black/30 p-3 rounded-xl border border-white/5">
+                  <AdminStat label="Coût total" value={formatCurrency(totalCost)} />
+                  <AdminStat
+                    label="Bénéfice"
+                    value={(profit >= 0 ? "+" : "") + formatCurrency(profit)}
+                    className={profit >= 0 ? "text-green-400" : "text-red-400"}
+                  />
+                  <AdminStat label="Prix achat" value={formatCurrency(phone.purchasePrice)} muted />
+                  <AdminStat label="Réparation" value={formatCurrency(phone.repairCost)} muted />
                 </div>
               </motion.div>
             )}
@@ -196,23 +200,24 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
           <div className="px-4 pb-4 flex flex-col gap-2">
             <div className="h-px bg-white/5 mb-1" />
 
-            {/* WhatsApp CTA — full width, prominent */}
+            {/* WhatsApp — primary CTA */}
             <button
               type="button"
               onClick={handleWhatsApp}
-              className="w-full h-12 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] active:scale-[0.98] transition-all text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-[#25D366]/20"
+              className="w-full h-12 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white active:scale-[0.98] transition-transform"
+              style={{ backgroundColor: "#25D366", boxShadow: "0 4px 20px rgba(37,211,102,0.25)" }}
               data-testid={`button-whatsapp-${phone.id}`}
             >
               <FaWhatsapp className="w-5 h-5" />
               Contacter sur WhatsApp
             </button>
 
-            {/* Secondary actions */}
+            {/* Secondary: Copy + Share */}
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={handleCopy}
-                className="h-11 rounded-xl bg-white/5 border border-white/8 text-white/80 hover:bg-white/10 hover:text-white active:scale-[0.97] transition-all text-sm font-medium flex items-center justify-center gap-2"
+                className="h-11 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white active:scale-[0.97] transition-all text-sm font-medium flex items-center justify-center gap-2"
                 data-testid={`button-copy-${phone.id}`}
               >
                 <Copy className="w-4 h-4" />
@@ -221,7 +226,7 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
               <button
                 type="button"
                 onClick={handleShare}
-                className="h-11 rounded-xl bg-white/5 border border-white/8 text-white/80 hover:bg-white/10 hover:text-white active:scale-[0.97] transition-all text-sm font-medium flex items-center justify-center gap-2"
+                className="h-11 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white active:scale-[0.97] transition-all text-sm font-medium flex items-center justify-center gap-2"
                 data-testid={`button-share-${phone.id}`}
               >
                 <Share2 className="w-4 h-4" />
@@ -231,11 +236,11 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
           </div>
         )}
 
-        {/* Admin actions footer */}
+        {/* Admin actions */}
         <div className="px-4 pb-4 flex gap-2">
           <Button
             variant="secondary"
-            className="flex-1 h-11 bg-white/5 hover:bg-white/10 text-white border border-white/5 text-sm"
+            className="flex-1 h-11 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-sm"
             onClick={() => onEdit(phone)}
             data-testid={`button-edit-${phone.id}`}
           >
@@ -289,5 +294,24 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
         </div>
       </Card>
     </motion.div>
+  );
+}
+
+function AdminStat({
+  label,
+  value,
+  className = "text-white",
+  muted = false,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+  muted?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">{label}</span>
+      <span className={`font-semibold text-sm ${muted ? "text-muted-foreground" : className}`}>{value}</span>
+    </div>
   );
 }

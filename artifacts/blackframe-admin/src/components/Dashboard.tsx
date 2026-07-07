@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format";
 import { Phone, PhoneStatus } from "@/hooks/types";
 import { PhoneCard } from "./PhoneCard";
-import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface DashboardProps {
@@ -34,45 +33,44 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
   const filters: Array<PhoneStatus | "Tous"> = ["Tous", "Disponible", "Réservé", "Vendu"];
 
   return (
-    <div className="flex flex-col gap-5 pb-28 px-4 pt-5 max-w-md mx-auto w-full">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="flex flex-col gap-5 pb-28 pt-5 max-w-md mx-auto w-full">
+      {/* KPIs */}
+      <div className="grid grid-cols-2 gap-3 px-4">
         <KPICard title="En stock" value={totalInStock} data-testid="kpi-stock" />
         <KPICard title="Vendus" value={totalSold} data-testid="kpi-sold" />
-        <KPICard
-          title="Bénéfice net"
-          value={formatCurrency(totalProfit)}
-          highlight
-          data-testid="kpi-profit"
-        />
-        <KPICard
-          title="Capital investi"
-          value={formatCurrency(investedCapital)}
-          data-testid="kpi-capital"
-        />
+        <KPICard title="Bénéfice net" value={formatCurrency(totalProfit)} highlight data-testid="kpi-profit" />
+        <KPICard title="Capital investi" value={formatCurrency(investedCapital)} data-testid="kpi-capital" />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {filters.map((f) => (
-          <Button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`rounded-full whitespace-nowrap h-10 px-5 shrink-0 font-medium transition-colors ${
-              filter === f
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10 hover:text-white"
-            }`}
-            data-testid={`filter-${f.toLowerCase()}`}
-          >
-            {f}
-          </Button>
-        ))}
+      {/* Filter bar — breaks out of px padding so last item isn't clipped */}
+      <div className="overflow-x-auto hide-scrollbar">
+        <div className="flex gap-2 px-4 pb-1" style={{ width: "max-content", minWidth: "100%" }}>
+          {filters.map(f => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={`h-10 px-5 rounded-full whitespace-nowrap text-sm font-medium shrink-0 transition-colors ${
+                filter === f
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10 hover:text-white"
+              }`}
+              data-testid={`filter-${f.toLowerCase()}`}
+            >
+              {f}
+            </button>
+          ))}
+          {/* trailing spacer so last item has right breathing room */}
+          <div className="w-2 shrink-0" />
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      {/* Phone list */}
+      <div className="flex flex-col gap-3 px-4">
         {filteredPhones.length === 0 ? (
           <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-3">
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-              <span className="text-2xl text-white/20">—</span>
+              <span className="text-xl text-white/20 font-light">—</span>
             </div>
             <p className="text-sm">Aucun téléphone trouvé</p>
           </div>
