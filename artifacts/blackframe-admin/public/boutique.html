@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0b">
+  <meta name="description" content="BLACK FRAME MOBILE — Vente et réparation de téléphones reconditionnés. Achetez un smartphone de qualité à prix juste.">
+  <title>BLACK FRAME MOBILE — Vente & Réparation</title>
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #0a0a0b;
+      color: #f0f0f2;
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100svh;
+      overflow-x: hidden;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    button, a { touch-action: manipulation; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Header ── */
+    .header {
+      background: #0a0a0b;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0 16px;
+      padding-top: env(safe-area-inset-top);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .header-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .brand p {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #0ac7db;
+      margin-top: 3px;
+    }
+
+    .wa-header-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #25D366;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      border: none;
+      border-radius: 50px;
+      padding: 9px 16px;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.30);
+      flex-shrink: 0;
+    }
+
+    .wa-header-btn svg { width: 16px; height: 16px; fill: #fff; }
+
+    /* ── Section title ── */
+    .section-header {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px 8px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .count-pill {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(10,199,219,0.12);
+      color: #0ac7db;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 2px 10px;
+      margin-left: 8px;
+    }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 8px 16px 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 540px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #141416;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Media area */
+    .card-media {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* Placeholder */
+    .media-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #141416 0%, #1c1c1f 100%);
+    }
+
+    .media-placeholder svg {
+      width: 52px;
+      height: 52px;
+      opacity: 0.15;
+    }
+
+    /* Badge strip over media */
+    .badge-strip {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 3px 10px;
+      line-height: 1.4;
+    }
+
+    .badge-available {
+      background: rgba(34,197,94,0.18);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .badge-new {
+      background: rgba(10,199,219,0.18);
+      color: #0ac7db;
+      border: 1px solid rgba(10,199,219,0.25);
+    }
+
+    .badge-deal {
+      background: rgba(249,115,22,0.18);
+      color: #fb923c;
+      border: 1px solid rgba(249,115,22,0.25);
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 14px 14px 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-model {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .card-price {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .card-price-min {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.35);
+      margin-left: 6px;
+    }
+
+    .card-notes {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Card footer */
+    .card-footer {
+      padding: 12px 14px 14px;
+    }
+
+    .wa-card-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: #25D366;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.22);
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      -webkit-appearance: none;
+    }
+
+    .wa-card-btn:active { opacity: 0.85; transform: scale(0.98); }
+    .wa-card-btn svg { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
+
+    /* ── Empty state ── */
+    .empty {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 40px 24px;
+      text-align: center;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .empty-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon svg { width: 36px; height: 36px; opacity: 0.2; }
+
+    .empty h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .empty p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.6;
+      max-width: 280px;
+    }
+
+    .empty .wa-empty-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #25D366;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 14px;
+      padding: 14px 28px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.25);
+      margin-top: 8px;
+    }
+
+    .empty .wa-empty-btn svg { width: 20px; height: 20px; fill: #fff; }
+
+    /* ── Footer ── */
+    .footer {
+      max-width: 600px;
+      margin: 40px auto 0;
+      padding: 24px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .footer p { font-size: 12px; color: rgba(255,255,255,0.25); }
+    .footer strong { color: rgba(255,255,255,0.5); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>BLACK FRAME MOBILE</h1>
+        <p>Vente &amp; Réparation de téléphones</p>
+      </div>
+      <a href="https://wa.me/33850406200?text=Bonjour%2C+je+voudrais+des+informations+sur+vos+t%C3%A9l%C3%A9phones."
+         class="wa-header-btn" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Nous contacter
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="section-header">
+      <span class="section-title">Téléphones disponibles</span>
+      <span class="count-pill" id="count">0</span>
+    </div>
+
+    <div class="grid" id="phones-grid"></div>
+
+    <div class="empty" id="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Aucun téléphone disponible</h2>
+      <p>Revenez bientôt — nous mettons régulièrement à jour notre stock.</p>
+      <a href="https://wa.me/33850406200?text=Bonjour%2C+est-ce+que+vous+avez+des+t%C3%A9l%C3%A9phones+disponibles+%3F"
+         class="wa-empty-btn" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Nous demander par WhatsApp
+      </a>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p><strong>BLACK FRAME MOBILE</strong></p>
+    <p>Téléphones reconditionnés · Réparation toutes marques</p>
+    <p style="margin-top:4px">
+      <a href="https://wa.me/33850406200" target="_blank" rel="noopener noreferrer"
+         style="color:rgba(255,255,255,0.35); text-decoration:none;">
+        0850 40 62 00
+      </a>
+    </p>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "blackframe_phones";
+    const WHATSAPP   = "33850406200";
+
+    const WA_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#fff" style="width:20px;height:20px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+    const PHONE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:52px;height:52px;color:#fff"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+
+    function getPhones() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw).filter(function(p) { return p.status === "Disponible"; });
+      } catch(e) { return []; }
+    }
+
+    function formatPrice(n) {
+      return new Intl.NumberFormat("fr-FR", {
+        style: "currency", currency: "EUR", minimumFractionDigits: 0, maximumFractionDigits: 0
+      }).format(n);
+    }
+
+    function daysSince(dateStr) {
+      return Math.floor((Date.now() - new Date(dateStr + "T00:00:00").getTime()) / 86400000);
+    }
+
+    function isNew(phone) { return daysSince(phone.purchaseDate) <= 7; }
+
+    function isGoodDeal(phone) {
+      var cost = phone.purchasePrice + phone.repairCost;
+      if (cost <= 0) return false;
+      var profit = phone.salePrice - cost;
+      return profit >= 50 && profit / cost >= 0.20;
+    }
+
+    function buildWaLink(model, price) {
+      var msg = "Bonjour, je suis intéressé par " + model + " à " + price + ", est-il disponible ?";
+      return "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(msg);
+    }
+
+    function renderMedia(phone) {
+      var media = phone.media;
+      if (!media || media.length === 0) {
+        return '<div class="media-placeholder">' + PHONE_SVG + '</div>';
+      }
+      var first = media[0];
+      if (first.type === "video") {
+        return '<video src="' + first.src + '" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:contain;background:#000"></video>';
+      }
+      return '<img src="' + first.src + '" alt="' + (phone.model || "Téléphone") + '" loading="lazy" style="width:100%;height:100%;object-fit:cover">';
+    }
+
+    function renderCard(phone) {
+      var price = formatPrice(phone.salePrice);
+      var badges = '<span class="badge badge-available">Disponible</span>';
+      if (isNew(phone))      badges += '<span class="badge badge-new">Nouveau</span>';
+      if (isGoodDeal(phone)) badges += '<span class="badge badge-deal">🔥 Bonne affaire</span>';
+
+      var notes = phone.notes
+        ? '<p class="card-notes">' + phone.notes.replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</p>'
+        : '';
+
+      var minPriceHtml = (phone.minPrice > 0 && phone.minPrice !== phone.salePrice)
+        ? '<span class="card-price-min">min. ' + formatPrice(phone.minPrice) + '</span>'
+        : '';
+
+      return [
+        '<div class="card">',
+          '<div class="card-media">',
+            renderMedia(phone),
+            '<div class="badge-strip">' + badges + '</div>',
+          '</div>',
+          '<div class="card-body">',
+            '<p class="card-model">' + phone.model.replace(/</g,"&lt;") + '</p>',
+            '<p class="card-price">' + price + minPriceHtml + '</p>',
+            notes,
+          '</div>',
+          '<div class="card-footer">',
+            '<a href="' + buildWaLink(phone.model, price) + '" class="wa-card-btn" target="_blank" rel="noopener noreferrer">',
+              WA_SVG,
+              'Contacter sur WhatsApp',
+            '</a>',
+          '</div>',
+        '</div>'
+      ].join('');
+    }
+
+    function render() {
+      var phones = getPhones();
+      var grid  = document.getElementById("phones-grid");
+      var empty = document.getElementById("empty-state");
+      var count = document.getElementById("count");
+
+      count.textContent = phones.length;
+
+      if (phones.length === 0) {
+        grid.innerHTML = "";
+        grid.style.display = "none";
+        empty.style.display = "flex";
+      } else {
+        // Sort: new first, then good deals, then by date desc
+        phones.sort(function(a, b) {
+          if (isNew(a) !== isNew(b)) return isNew(a) ? -1 : 1;
+          if (isGoodDeal(a) !== isGoodDeal(b)) return isGoodDeal(a) ? -1 : 1;
+          return new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime();
+        });
+        grid.innerHTML = phones.map(renderCard).join('');
+        grid.style.display = "grid";
+        empty.style.display = "none";
+      }
+    }
+
+    // Initial render
+    render();
+
+    // Live update when admin (another tab) modifies localStorage
+    window.addEventListener("storage", function(e) {
+      if (e.key === STORAGE_KEY || e.key === null) render();
+    });
+
+    // Polling fallback every 4s (same-tab changes not caught by storage event)
+    setInterval(render, 4000);
+  </script>
+</body>
+</html>
