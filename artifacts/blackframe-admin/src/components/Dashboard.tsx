@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format";
 import { Phone, PhoneStatus } from "@/hooks/types";
 import { PhoneCard } from "./PhoneCard";
+import { StatsPanel } from "./StatsPanel";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface DashboardProps {
@@ -34,7 +35,8 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
 
   return (
     <div className="flex flex-col gap-5 pb-28 pt-5 max-w-md mx-auto w-full">
-      {/* KPIs */}
+
+      {/* KPI cards */}
       <div className="grid grid-cols-2 gap-3 px-4">
         <KPICard title="En stock" value={totalInStock} data-testid="kpi-stock" />
         <KPICard title="Vendus" value={totalSold} data-testid="kpi-sold" />
@@ -42,7 +44,12 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
         <KPICard title="Capital investi" value={formatCurrency(investedCapital)} data-testid="kpi-capital" />
       </div>
 
-      {/* Filter bar — breaks out of px padding so last item isn't clipped */}
+      {/* Smart stats */}
+      <div className="px-4">
+        <StatsPanel phones={phones} />
+      </div>
+
+      {/* Filter bar */}
       <div className="overflow-x-auto hide-scrollbar">
         <div className="flex gap-2 px-4 pb-1" style={{ width: "max-content", minWidth: "100%" }}>
           {filters.map(f => (
@@ -60,7 +67,6 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
               {f}
             </button>
           ))}
-          {/* trailing spacer so last item has right breathing room */}
           <div className="w-2 shrink-0" />
         </div>
       </div>
