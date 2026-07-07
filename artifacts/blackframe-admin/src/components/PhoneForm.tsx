@@ -1,14 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Phone } from "@/hooks/types";
+import { Phone, MediaItem } from "@/hooks/types";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/format";
+import { MediaPicker } from "@/components/MediaPicker";
 
 const formSchema = z.object({
   model: z.string().min(1, "Le modèle est requis"),
@@ -22,6 +23,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+export type FormSubmitData = FormValues & { media: MediaItem[] };
 
 const defaultValues: FormValues = {
   model: "",
@@ -36,11 +38,13 @@ const defaultValues: FormValues = {
 
 interface PhoneFormProps {
   initialData?: Phone | null;
-  onSubmit: (data: FormValues) => void;
+  onSubmit: (data: FormSubmitData) => void;
   onCancel: () => void;
 }
 
 export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
+  const [media, setMedia] = useState<MediaItem[]>(initialData?.media ?? []);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
@@ -69,8 +73,10 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
         purchaseDate: initialData.purchaseDate,
         notes: initialData.notes ?? "",
       });
+      setMedia(initialData.media ?? []);
     } else {
       form.reset(defaultValues);
+      setMedia([]);
     }
   }, [initialData]);
 
@@ -82,6 +88,10 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
   const totalCost = Number(purchasePrice) + Number(repairCost);
   const profit = Number(salePrice) - totalCost;
 
+  const handleSubmit = (values: FormValues) => {
+    onSubmit({ ...values, media });
+  };
+
   return (
     <div className="flex flex-col max-w-md mx-auto w-full px-4 pt-6 pb-32">
       <div className="mb-6">
@@ -89,7 +99,16 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+
+          {/* Médias */}
+          <div className="flex flex-col gap-2">
+            <label className="text-muted-foreground uppercase tracking-wider text-xs font-medium">
+              Photos &amp; Vidéos
+            </label>
+            <MediaPicker value={media} onChange={setMedia} />
+          </div>
+
           <FormField
             control={form.control}
             name="model"

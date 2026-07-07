@@ -16,6 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { motion } from "framer-motion";
+import { MediaSlider } from "@/components/MediaSlider";
 
 interface PhoneCardProps {
   phone: Phone;
@@ -34,6 +35,8 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
     Vendu: "bg-red-500/15 text-red-400 border-red-500/20",
   };
 
+  const hasMedia = phone.media && phone.media.length > 0;
+
   return (
     <motion.div
       layout
@@ -43,103 +46,111 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
       transition={{ duration: 0.2 }}
       data-testid={`card-phone-${phone.id}`}
     >
-      <Card className="p-4 flex flex-col gap-3 border-white/5 bg-white/5 shadow-none">
-        <div className="flex justify-between items-start gap-3">
-          <div className="flex flex-col gap-1 min-w-0">
-            <h3 className="font-bold text-lg leading-tight tracking-tight truncate">{phone.model}</h3>
-            <div className="text-xs text-muted-foreground">
-              {new Date(phone.purchaseDate + "T00:00:00").toLocaleDateString("fr-FR")}
+      <Card className="flex flex-col border-white/5 bg-white/5 shadow-none overflow-hidden">
+        {hasMedia && (
+          <div className="w-full">
+            <MediaSlider media={phone.media} />
+          </div>
+        )}
+
+        <div className="p-4 flex flex-col gap-3">
+          <div className="flex justify-between items-start gap-3">
+            <div className="flex flex-col gap-1 min-w-0">
+              <h3 className="font-bold text-lg leading-tight tracking-tight truncate">{phone.model}</h3>
+              <div className="text-xs text-muted-foreground">
+                {new Date(phone.purchaseDate + "T00:00:00").toLocaleDateString("fr-FR")}
+              </div>
+            </div>
+            <Badge
+              variant="outline"
+              className={`shrink-0 rounded-full font-medium text-xs px-3 py-1 border ${statusColors[phone.status]}`}
+            >
+              {phone.status}
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 text-sm bg-black/30 p-3 rounded-lg border border-white/5">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Prix Vente</span>
+              <span className="font-semibold text-base">{formatCurrency(phone.salePrice)}</span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Bénéfice</span>
+              <span className={`font-semibold text-base ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Coût total</span>
+              <span className="font-medium text-sm text-muted-foreground">{formatCurrency(totalCost)}</span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Prix min</span>
+              <span className="font-medium text-sm text-muted-foreground">{formatCurrency(phone.minPrice)}</span>
             </div>
           </div>
-          <Badge
-            variant="outline"
-            className={`shrink-0 rounded-full font-medium text-xs px-3 py-1 border ${statusColors[phone.status]}`}
-          >
-            {phone.status}
-          </Badge>
-        </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm bg-black/30 p-3 rounded-lg border border-white/5">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Prix Vente</span>
-            <span className="font-semibold text-base">{formatCurrency(phone.salePrice)}</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Bénéfice</span>
-            <span className={`font-semibold text-base ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-              {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
-            </span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Coût total</span>
-            <span className="font-medium text-sm text-muted-foreground">{formatCurrency(totalCost)}</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Prix min</span>
-            <span className="font-medium text-sm text-muted-foreground">{formatCurrency(phone.minPrice)}</span>
-          </div>
-        </div>
+          {phone.notes ? (
+            <p className="text-xs text-muted-foreground bg-white/3 rounded-lg px-3 py-2 border border-white/5 line-clamp-2">
+              {phone.notes}
+            </p>
+          ) : null}
 
-        {phone.notes ? (
-          <p className="text-xs text-muted-foreground bg-white/3 rounded-lg px-3 py-2 border border-white/5 line-clamp-2">
-            {phone.notes}
-          </p>
-        ) : null}
-
-        <div className="flex gap-2 pt-1">
-          <Button
-            variant="secondary"
-            className="flex-1 h-11 bg-white/5 hover:bg-white/10 text-white border border-white/5"
-            onClick={() => onEdit(phone)}
-            data-testid={`button-edit-${phone.id}`}
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Modifier
-          </Button>
-
-          {phone.status !== "Vendu" && (
+          <div className="flex gap-2">
             <Button
-              variant="default"
-              className="flex-1 h-11 font-semibold"
-              onClick={() => onMarkSold(phone.id)}
-              data-testid={`button-sold-${phone.id}`}
+              variant="secondary"
+              className="flex-1 h-11 bg-white/5 hover:bg-white/10 text-white border border-white/5"
+              onClick={() => onEdit(phone)}
+              data-testid={`button-edit-${phone.id}`}
             >
-              <Check className="w-4 h-4 mr-2" />
-              Vendu
+              <Edit className="w-4 h-4 mr-2" />
+              Modifier
             </Button>
-          )}
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+            {phone.status !== "Vendu" && (
               <Button
-                variant="ghost"
-                size="icon"
-                className="w-11 h-11 shrink-0 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20"
-                data-testid={`button-delete-${phone.id}`}
+                variant="default"
+                className="flex-1 h-11 font-semibold"
+                onClick={() => onMarkSold(phone.id)}
+                data-testid={`button-sold-${phone.id}`}
               >
-                <Trash2 className="w-4 h-4" />
+                <Check className="w-4 h-4 mr-2" />
+                Vendu
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="w-[90vw] max-w-sm rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Supprimer ce téléphone ?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Cette action est irréversible. "{phone.model}" sera retiré de l'inventaire.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="flex-col gap-2 sm:flex-col mt-2">
-                <AlertDialogAction
-                  onClick={() => onDelete(phone.id)}
-                  className="h-12 w-full bg-red-500 text-white hover:bg-red-600"
+            )}
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-11 h-11 shrink-0 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20"
+                  data-testid={`button-delete-${phone.id}`}
                 >
-                  Supprimer
-                </AlertDialogAction>
-                <AlertDialogCancel className="mt-0 h-12 w-full border-white/10">
-                  Annuler
-                </AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="w-[90vw] max-w-sm rounded-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Supprimer ce téléphone ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. "{phone.model}" sera retiré de l'inventaire.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="flex-col gap-2 sm:flex-col mt-2">
+                  <AlertDialogAction
+                    onClick={() => onDelete(phone.id)}
+                    className="h-12 w-full bg-red-500 text-white hover:bg-red-600"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                  <AlertDialogCancel className="mt-0 h-12 w-full border-white/10">
+                    Annuler
+                  </AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </Card>
     </motion.div>

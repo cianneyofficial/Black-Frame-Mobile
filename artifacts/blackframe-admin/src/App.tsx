@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { usePhones } from "@/hooks/use-phones";
 import { Dashboard } from "@/components/Dashboard";
-import { PhoneForm } from "@/components/PhoneForm";
+import { PhoneForm, FormSubmitData } from "@/components/PhoneForm";
 import { BottomNav } from "@/components/BottomNav";
 import { Phone } from "@/hooks/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,7 @@ function App() {
     setTab("form");
   };
 
-  const handleAddSubmit = (data: Omit<Phone, "id">) => {
+  const handleAddSubmit = (data: FormSubmitData) => {
     if (editingPhone) {
       updatePhone(editingPhone.id, data);
     } else {
@@ -34,10 +34,6 @@ function App() {
   const handleCancel = () => {
     setEditingPhone(null);
     setTab("dashboard");
-  };
-
-  const handleMarkSold = (id: string) => {
-    markAsSold(id);
   };
 
   return (
@@ -61,7 +57,7 @@ function App() {
                 phones={phones}
                 onEdit={handleEdit}
                 onDelete={deletePhone}
-                onMarkSold={handleMarkSold}
+                onMarkSold={markAsSold}
               />
             </motion.div>
           ) : (

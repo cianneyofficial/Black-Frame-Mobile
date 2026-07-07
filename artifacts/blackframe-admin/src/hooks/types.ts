@@ -1,5 +1,12 @@
 export type PhoneStatus = "Disponible" | "Réservé" | "Vendu";
 
+export interface MediaItem {
+  id: string;
+  type: "image" | "video";
+  src: string;
+  name?: string;
+}
+
 export interface Phone {
   id: string;
   model: string;
@@ -10,4 +17,5 @@ export interface Phone {
   status: PhoneStatus;
   purchaseDate: string;
   notes: string;
+  media: MediaItem[];
 }
