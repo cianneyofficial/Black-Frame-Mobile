@@ -85,6 +85,9 @@
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
   }
+  button, a, [role="button"], input, select, textarea {
+    touch-action: manipulation;
+  }
   html {
     min-height: 100%;
     scroll-behavior: smooth;

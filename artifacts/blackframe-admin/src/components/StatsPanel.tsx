@@ -100,7 +100,7 @@ export function StatsPanel({ phones }: StatsPanelProps) {
 
       {/* Stale stock alert */}
       {stalePhones.length > 0 && (
-        <div className="bg-orange-500/8 border border-orange-500/20 rounded-2xl overflow-hidden">
+        <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-4 py-3 border-b border-orange-500/10">
             <AlertTriangle className="w-4 h-4 text-orange-400 shrink-0" />
             <div>

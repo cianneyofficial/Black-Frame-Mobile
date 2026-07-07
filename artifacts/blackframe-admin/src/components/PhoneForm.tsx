@@ -93,7 +93,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
   };
 
   return (
-    <div className="flex flex-col max-w-md mx-auto w-full px-4 pt-6 pb-32">
+    <div className="flex flex-col max-w-md mx-auto w-full px-4 pt-6 pb-40">
       <div className="mb-6">
         <h2 className="text-2xl font-bold">{initialData ? "Modifier" : "Ajouter"} un téléphone</h2>
       </div>

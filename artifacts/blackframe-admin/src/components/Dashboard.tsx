@@ -49,25 +49,24 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
         <StatsPanel phones={phones} />
       </div>
 
-      {/* Filter bar */}
+      {/* Filter bar — px-3 buttons so all 4 fit on 390px without hidden scroll */}
       <div className="overflow-x-auto hide-scrollbar">
-        <div className="flex gap-2 px-4 pb-1" style={{ width: "max-content", minWidth: "100%" }}>
+        <div className="flex gap-2 pl-4 pr-2 pb-1" style={{ width: "max-content", minWidth: "100%" }}>
           {filters.map(f => (
             <button
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className={`h-10 px-5 rounded-full whitespace-nowrap text-sm font-medium shrink-0 transition-colors ${
+              className={`h-9 px-3 rounded-full whitespace-nowrap text-sm font-medium shrink-0 transition-colors ${
                 filter === f
                   ? "bg-primary text-primary-foreground"
-                  : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10 hover:text-white"
+                  : "bg-white/5 text-muted-foreground border border-white/10 active:bg-white/10"
               }`}
               data-testid={`filter-${f.toLowerCase()}`}
             >
               {f}
             </button>
           ))}
-          <div className="w-2 shrink-0" />
         </div>
       </div>
 
