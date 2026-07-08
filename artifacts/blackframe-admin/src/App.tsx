@@ -9,11 +9,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut } from "lucide-react";
 
 // ── Auth guard — runs before first render ─────────────────────────────────────
-// If not logged in and accessing /, redirect to the PUBLIC homepage (not admin login).
-// The admin login is reached explicitly via /admin.html in the nav.
+// Rule: admin lives at /dashboard.html. / is ALWAYS the public site.
 const isLoggedIn = localStorage.getItem("admin_logged") === "true";
 if (!isLoggedIn) {
+  // Not authenticated → public site
   window.location.replace("/index.html");
+} else if (
+  window.location.pathname === "/" ||
+  window.location.pathname === ""
+) {
+  // Authenticated but landed on / → normalize to /dashboard.html
+  window.location.replace("/dashboard.html");
 }
 
 function App() {
@@ -25,8 +31,10 @@ function App() {
     document.documentElement.classList.add("dark");
   }, []);
 
-  // Don't render anything while redirecting
-  if (!isLoggedIn) return null;
+  // Don't render while redirecting (not logged in, or normalizing URL to /dashboard.html)
+  const atRoot =
+    window.location.pathname === "/" || window.location.pathname === "";
+  if (!isLoggedIn || atRoot) return null;
 
   const handleEdit = (phone: Phone) => {
     setEditingPhone(phone);
