@@ -1,0 +1,150 @@
+Améliore le système BLACK FRAME MOBILE en ajoutant des fonctionnalités commerciales avancées et intelligentes.
+
+OBJECTIF :
+Transformer l’admin en outil de gestion de business professionnel, rapide, clair et optimisé pour mobile.
+
+---
+
+1. MULTI-DEVISE (TRÈS IMPORTANT)
+
+---
+
+Tous les montants doivent être affichés en :
+
+- Franc Congolais (CDF)
+- Conversion automatique en Dollars ($)
+
+TAUX :
+1 USD = 2500 CDF (modifiable)
+
+Afficher systématiquement :
+
+- Prix en CDF
+- Prix équivalent en USD
+
+Exemple :
+120000 CDF (~48$)
+
+---
+
+2. CALCULS AUTOMATIQUES
+
+---
+
+Ajouter automatiquement :
+
+- coût total = prix achat + coût réparation
+- bénéfice = prix vente - coût total
+- marge (%) = (bénéfice / coût total) * 100
+- ROI = (bénéfice / investissement) * 100
+
+Afficher tous les calculs en temps réel.
+
+---
+
+3. SYSTÈME INTELLIGENT
+
+---
+
+Afficher automatiquement :
+
+- 🔥 téléphone le plus rentable
+- 📉 téléphone avec faible marge
+- ⚠️ alerte si bénéfice < 20000 CDF
+- 🕒 alerte si stock > 7 jours
+
+---
+
+4. GESTION PRIX STRATÉGIQUE
+
+---
+
+Ajouter :
+
+- prix minimum
+- alerte si prix de vente < prix minimum
+
+---
+
+5. DASHBOARD PRO
+
+---
+
+Afficher :
+
+- capital total investi
+- bénéfice total
+- bénéfice moyen
+- nombre vendu
+- stock actuel
+
+---
+
+6. HISTORIQUE DES VENTES
+
+---
+
+Quand le statut = vendu :
+
+- enregistrer la date de vente
+- enregistrer le bénéfice
+
+Créer une section “Historique”.
+
+---
+
+7. SYSTÈME DE RECOMMANDATION
+
+---
+
+Afficher des recommandations automatiques :
+
+- “À vendre rapidement”
+- “Très rentable”
+- “À éviter”
+
+---
+
+8. AMÉLIORATION UX
+
+---
+
+- couleurs :
+  - vert = bon
+  - rouge = risque
+- badges intelligents
+- interface claire, moderne et responsive
+
+---
+
+9. PERFORMANCE
+
+---
+
+- tout doit fonctionner avec localStorage
+- rapide sur mobile
+- chargement fluide
+- calculs instantanés
+
+---
+
+10. BONUS PRO
+
+---
+
+Ajouter une simulation de prix :
+
+- si je vends à X, combien je gagne ?
+
+---
+
+11. LIVRABLE FINAL
+
+---
+
+Fournir le projet complet prêt à être téléchargé et conservé, idéalement en ZIP, afin que je puisse le récupérer facilement et l’archiver.
+
+---
+
+OBJECTIF FINAL :
+Créer un système intelligent qui aide à gagner plus d’argent automatiquement.

@@ -12,7 +12,6 @@ export function usePhones() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed: Phone[] = JSON.parse(stored);
-        // Ensure media field always exists
         setPhones(parsed.map(p => ({ ...p, media: p.media ?? [] })));
       }
     } catch {
@@ -36,12 +35,12 @@ export function usePhones() {
       media: phone.media ?? [],
     };
     save([...phones, newPhone]);
-    toast.success("Téléphone ajouté avec succès");
+    toast.success("Téléphone ajouté ✓");
   };
 
   const updatePhone = (id: string, updates: Partial<Phone>) => {
     save(phones.map(p => (p.id === id ? { ...p, ...updates } : p)));
-    toast.success("Téléphone mis à jour");
+    toast.success("Téléphone mis à jour ✓");
   };
 
   const deletePhone = (id: string) => {
@@ -50,8 +49,13 @@ export function usePhones() {
   };
 
   const markAsSold = (id: string) => {
-    save(phones.map(p => (p.id === id ? { ...p, status: "Vendu" } : p)));
-    toast.success("Marqué comme vendu");
+    const today = new Date().toISOString().split("T")[0];
+    save(
+      phones.map(p =>
+        p.id === id ? { ...p, status: "Vendu", saleDate: today } : p,
+      ),
+    );
+    toast.success("Marqué comme vendu ✓");
   };
 
   return { phones, addPhone, updatePhone, deletePhone, markAsSold };

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/format";
 import { Phone, PhoneStatus } from "@/hooks/types";
 import { PhoneCard } from "./PhoneCard";
 import { StatsPanel } from "./StatsPanel";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCurrency } from "@/contexts/currency-context";
+import { profit, totalCost } from "@/lib/calc";
 
 interface DashboardProps {
   phones: Phone[];
@@ -15,17 +16,15 @@ interface DashboardProps {
 
 export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardProps) {
   const [filter, setFilter] = useState<PhoneStatus | "Tous">("Tous");
+  const { fmt, fmtUSD } = useCurrency();
 
-  const totalInStock = phones.filter(p => p.status === "Disponible" || p.status === "Réservé").length;
-  const totalSold = phones.filter(p => p.status === "Vendu").length;
+  const available = phones.filter(p => p.status === "Disponible");
+  const inStock = phones.filter(p => p.status === "Disponible" || p.status === "Réservé");
+  const sold = phones.filter(p => p.status === "Vendu");
 
-  const totalProfit = phones
-    .filter(p => p.status === "Vendu")
-    .reduce((sum, p) => sum + (p.salePrice - (p.purchasePrice + p.repairCost)), 0);
-
-  const investedCapital = phones
-    .filter(p => p.status !== "Vendu")
-    .reduce((sum, p) => sum + p.purchasePrice + p.repairCost, 0);
+  const totalProfit = sold.reduce((s, p) => s + profit(p), 0);
+  const investedCapital = inStock.reduce((s, p) => s + totalCost(p), 0);
+  const avgProfit = sold.length > 0 ? totalProfit / sold.length : 0;
 
   const filteredPhones = phones
     .filter(p => filter === "Tous" || p.status === filter)
@@ -36,12 +35,30 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
   return (
     <div className="flex flex-col gap-5 pb-28 pt-5 max-w-md mx-auto w-full">
 
-      {/* KPI cards */}
+      {/* KPI grid */}
       <div className="grid grid-cols-2 gap-3 px-4">
-        <KPICard title="En stock" value={totalInStock} data-testid="kpi-stock" />
-        <KPICard title="Vendus" value={totalSold} data-testid="kpi-sold" />
-        <KPICard title="Bénéfice net" value={formatCurrency(totalProfit)} highlight data-testid="kpi-profit" />
-        <KPICard title="Capital investi" value={formatCurrency(investedCapital)} data-testid="kpi-capital" />
+        <KPICard
+          title="Capital investi"
+          value={fmt(investedCapital)}
+          sub={fmtUSD(investedCapital)}
+        />
+        <KPICard
+          title="Bénéfice total"
+          value={(totalProfit >= 0 ? "+" : "") + fmt(totalProfit)}
+          sub={fmtUSD(Math.abs(totalProfit))}
+          highlight={totalProfit >= 0}
+          warn={totalProfit < 0}
+        />
+        <KPICard
+          title="En stock"
+          value={String(available.length)}
+          sub={`${inStock.length} au total (+ réservés)`}
+        />
+        <KPICard
+          title="Vendus"
+          value={String(sold.length)}
+          sub={sold.length > 0 ? `Moy. ${fmt(avgProfit)}` : "Aucune vente"}
+        />
       </div>
 
       {/* Smart stats */}
@@ -49,7 +66,7 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
         <StatsPanel phones={phones} />
       </div>
 
-      {/* Filter bar — px-3 buttons so all 4 fit on 390px without hidden scroll */}
+      {/* Filter bar */}
       <div className="overflow-x-auto hide-scrollbar">
         <div className="flex gap-2 pl-4 pr-2 pb-1" style={{ width: "max-content", minWidth: "100%" }}>
           {filters.map(f => (
@@ -62,9 +79,13 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
                   ? "bg-primary text-primary-foreground"
                   : "bg-white/5 text-muted-foreground border border-white/10 active:bg-white/10"
               }`}
-              data-testid={`filter-${f.toLowerCase()}`}
             >
               {f}
+              {f !== "Tous" && (
+                <span className="ml-1.5 text-[10px] opacity-60">
+                  {phones.filter(p => p.status === f).length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -99,21 +120,22 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
 
 interface KPICardProps {
   title: string;
-  value: string | number;
+  value: string;
+  sub?: string;
   highlight?: boolean;
-  "data-testid"?: string;
+  warn?: boolean;
 }
 
-function KPICard({ title, value, highlight = false, "data-testid": testId }: KPICardProps) {
+function KPICard({ title, value, sub, highlight = false, warn = false }: KPICardProps) {
   return (
-    <Card
-      className="p-4 border-white/5 bg-white/5 flex flex-col justify-between min-h-[90px] shadow-none"
-      data-testid={testId}
-    >
+    <Card className="p-4 border-white/5 bg-white/5 flex flex-col justify-between min-h-[90px] shadow-none gap-1">
       <h4 className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{title}</h4>
-      <div className={`text-2xl font-bold tracking-tight mt-2 ${highlight ? "text-primary" : "text-white"}`}>
+      <div className={`text-lg font-black tracking-tight leading-tight ${
+        highlight ? "text-green-400" : warn ? "text-red-400" : "text-white"
+      }`}>
         {value}
       </div>
+      {sub && <p className="text-[10px] text-muted-foreground leading-tight">{sub}</p>}
     </Card>
   );
 }

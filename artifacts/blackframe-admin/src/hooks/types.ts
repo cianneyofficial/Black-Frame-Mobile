@@ -16,6 +16,7 @@ export interface Phone {
   minPrice: number;
   status: PhoneStatus;
   purchaseDate: string;
+  saleDate?: string;
   notes: string;
   media: MediaItem[];
 }

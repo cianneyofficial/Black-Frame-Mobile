@@ -8,8 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatCurrency } from "@/lib/format";
 import { MediaPicker } from "@/components/MediaPicker";
+import { useCurrency } from "@/contexts/currency-context";
+import { profitAtPrice, marginAtPrice } from "@/lib/calc";
 
 const formSchema = z.object({
   model: z.string().min(1, "Le modèle est requis"),
@@ -44,6 +45,8 @@ interface PhoneFormProps {
 
 export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
   const [media, setMedia] = useState<MediaItem[]>(initialData?.media ?? []);
+  const [simPrice, setSimPrice] = useState<number>(0);
+  const { fmt, fmtUSD, rate } = useCurrency();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,28 +77,39 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
         notes: initialData.notes ?? "",
       });
       setMedia(initialData.media ?? []);
+      setSimPrice(initialData.salePrice);
     } else {
       form.reset(defaultValues);
       setMedia([]);
+      setSimPrice(0);
     }
   }, [initialData]);
 
   const { watch } = form;
-  const purchasePrice = watch("purchasePrice") || 0;
-  const repairCost = watch("repairCost") || 0;
-  const salePrice = watch("salePrice") || 0;
+  const purchasePrice = Number(watch("purchasePrice")) || 0;
+  const repairCost = Number(watch("repairCost")) || 0;
+  const salePrice = Number(watch("salePrice")) || 0;
 
-  const totalCost = Number(purchasePrice) + Number(repairCost);
-  const profit = Number(salePrice) - totalCost;
+  const totalCost = purchasePrice + repairCost;
+  const profit = salePrice - totalCost;
+  const marginPct = totalCost > 0 ? (profit / totalCost) * 100 : 0;
+  const roiPct = purchasePrice > 0 ? (profit / purchasePrice) * 100 : 0;
+
+  const mockPhone = { purchasePrice, repairCost, salePrice, minPrice: 0 } as Phone;
+  const simProfit = profitAtPrice(mockPhone, simPrice);
+  const simMargin = marginAtPrice(mockPhone, simPrice);
 
   const handleSubmit = (values: FormValues) => {
     onSubmit({ ...values, media });
   };
 
+  const inputCls = "h-12 bg-white/5 border-white/10 text-base font-medium focus-visible:ring-primary";
+
   return (
     <div className="flex flex-col max-w-md mx-auto w-full px-4 pt-6 pb-40">
       <div className="mb-6">
         <h2 className="text-2xl font-bold">{initialData ? "Modifier" : "Ajouter"} un téléphone</h2>
+        <p className="text-xs text-muted-foreground mt-1">Tous les prix en Francs Congolais (CDF) · 1 $ = {rate.toLocaleString("fr-FR")} CDF</p>
       </div>
 
       <Form {...form}>
@@ -109,6 +123,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
             <MediaPicker value={media} onChange={setMedia} />
           </div>
 
+          {/* Modèle */}
           <FormField
             control={form.control}
             name="model"
@@ -118,7 +133,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
                 <FormControl>
                   <Input
                     placeholder="Ex: iPhone 14 Pro 128GB"
-                    className="h-12 bg-white/5 border-white/10 text-base focus-visible:ring-primary"
+                    className={`${inputCls} text-base`}
                     {...field}
                   />
                 </FormControl>
@@ -127,21 +142,16 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
             )}
           />
 
+          {/* Prix achat + réparation */}
           <div className="grid grid-cols-2 gap-3">
             <FormField
               control={form.control}
               name="purchasePrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Prix Achat (€)</FormLabel>
+                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Prix Achat (CDF)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      step="1"
-                      className="h-12 bg-white/5 border-white/10 text-base font-medium"
-                      {...field}
-                    />
+                    <Input type="number" inputMode="numeric" step="100" className={inputCls} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,15 +162,9 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
               name="repairCost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Réparation (€)</FormLabel>
+                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Réparation (CDF)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      step="1"
-                      className="h-12 bg-white/5 border-white/10 text-base font-medium"
-                      {...field}
-                    />
+                    <Input type="number" inputMode="numeric" step="100" className={inputCls} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -168,18 +172,19 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
             />
           </div>
 
+          {/* Prix vente + min */}
           <div className="grid grid-cols-2 gap-3">
             <FormField
               control={form.control}
               name="salePrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-primary uppercase tracking-wider text-xs font-bold">Prix Vente (€)</FormLabel>
+                  <FormLabel className="text-primary uppercase tracking-wider text-xs font-bold">Prix Vente (CDF)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      inputMode="decimal"
-                      step="1"
+                      inputMode="numeric"
+                      step="100"
                       className="h-12 bg-primary/10 border-primary/30 text-primary text-base font-bold focus-visible:ring-primary"
                       {...field}
                     />
@@ -193,15 +198,9 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
               name="minPrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Prix Min (€)</FormLabel>
+                  <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Prix Min (CDF)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      step="1"
-                      className="h-12 bg-white/5 border-white/10 text-base font-medium"
-                      {...field}
-                    />
+                    <Input type="number" inputMode="numeric" step="100" className={inputCls} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -209,20 +208,73 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
             />
           </div>
 
-          <div className="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col gap-2">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Coût total (Achat + Rép.)</span>
-              <span className="font-medium text-white">{formatCurrency(totalCost)}</span>
+          {/* Live calculation panel */}
+          <div className="bg-black/40 border border-white/8 rounded-xl p-4 flex flex-col gap-3">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Calcul automatique</p>
+            <div className="grid grid-cols-2 gap-3">
+              <CalcRow label="Coût total" value={fmt(totalCost)} sub={fmtUSD(totalCost)} />
+              <CalcRow
+                label="Bénéfice"
+                value={(profit >= 0 ? "+" : "") + fmt(profit)}
+                sub={fmtUSD(Math.abs(profit))}
+                className={profit >= 0 ? "text-green-400" : "text-red-400"}
+              />
+              <CalcRow
+                label="Marge"
+                value={marginPct.toFixed(1) + "%"}
+                className={marginPct >= 30 ? "text-green-400" : marginPct >= 15 ? "text-yellow-400" : "text-red-400"}
+              />
+              <CalcRow
+                label="ROI"
+                value={roiPct.toFixed(1) + "%"}
+                className="text-primary"
+              />
             </div>
-            <div className="h-px bg-white/5 w-full" />
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground font-semibold text-sm">Bénéfice estimé</span>
-              <span className={`text-lg font-bold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-                {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
-              </span>
-            </div>
+            {profit < 20_000 && salePrice > 0 && (
+              <div className="flex items-center gap-2 bg-red-500/10 rounded-lg px-3 py-2 border border-red-500/15">
+                <span className="text-xs text-red-400 font-medium">⚠️ Bénéfice &lt; 20 000 CDF — vérifiez le prix</span>
+              </div>
+            )}
           </div>
 
+          {/* Price Simulator */}
+          <div className="bg-black/40 border border-primary/15 rounded-xl p-4 flex flex-col gap-3">
+            <p className="text-[10px] uppercase tracking-widest text-primary font-bold">🔮 Simulateur de prix</p>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Si je vends à (CDF)</label>
+              <Input
+                type="number"
+                inputMode="numeric"
+                step="100"
+                value={simPrice || ""}
+                onChange={e => setSimPrice(Number(e.target.value))}
+                placeholder="Ex: 350 000"
+                className="h-12 bg-white/5 border-primary/20 text-primary text-base font-bold focus-visible:ring-primary"
+              />
+            </div>
+            {simPrice > 0 && totalCost > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                <SimResult
+                  label="Bénéfice"
+                  value={(simProfit >= 0 ? "+" : "") + fmt(simProfit)}
+                  sub={fmtUSD(Math.abs(simProfit))}
+                  className={simProfit >= 0 ? "text-green-400" : "text-red-400"}
+                />
+                <SimResult
+                  label="Marge"
+                  value={simMargin.toFixed(1) + "%"}
+                  className={simMargin >= 30 ? "text-green-400" : simMargin >= 15 ? "text-yellow-400" : "text-red-400"}
+                />
+                <SimResult
+                  label="ROI"
+                  value={purchasePrice > 0 ? (simProfit / purchasePrice * 100).toFixed(1) + "%" : "—"}
+                  className="text-primary"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Statut + date */}
           <div className="grid grid-cols-2 gap-3">
             <FormField
               control={form.control}
@@ -253,11 +305,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
                 <FormItem>
                   <FormLabel className="text-muted-foreground uppercase tracking-wider text-xs">Date d'achat</FormLabel>
                   <FormControl>
-                    <Input
-                      type="date"
-                      className="h-12 bg-white/5 border-white/10 text-base block w-full"
-                      {...field}
-                    />
+                    <Input type="date" className="h-12 bg-white/5 border-white/10 text-base block w-full" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -265,6 +313,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
             />
           </div>
 
+          {/* Notes */}
           <FormField
             control={form.control}
             name="notes"
@@ -284,11 +333,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
           />
 
           <div className="flex flex-col gap-3 pt-2">
-            <Button
-              type="submit"
-              className="w-full h-14 text-base font-bold rounded-xl"
-              data-testid="button-submit"
-            >
+            <Button type="submit" className="w-full h-14 text-base font-bold rounded-xl">
               {initialData ? "Enregistrer les modifications" : "Ajouter à l'inventaire"}
             </Button>
             <Button
@@ -296,13 +341,52 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
               variant="outline"
               onClick={onCancel}
               className="w-full h-14 text-base font-medium bg-transparent border-white/10 text-white hover:bg-white/5 rounded-xl"
-              data-testid="button-cancel"
             >
               Annuler
             </Button>
           </div>
         </form>
       </Form>
+    </div>
+  );
+}
+
+function CalcRow({
+  label,
+  value,
+  sub,
+  className = "text-white",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  className?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</span>
+      <span className={`text-sm font-black ${className}`}>{value}</span>
+      {sub && <span className="text-[10px] text-muted-foreground/60">{sub}</span>}
+    </div>
+  );
+}
+
+function SimResult({
+  label,
+  value,
+  sub,
+  className = "text-white",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  className?: string;
+}) {
+  return (
+    <div className="bg-white/5 rounded-lg p-2.5 flex flex-col gap-0.5">
+      <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{label}</span>
+      <span className={`text-sm font-black ${className}`}>{value}</span>
+      {sub && <span className="text-[10px] text-muted-foreground/60">{sub}</span>}
     </div>
   );
 }
