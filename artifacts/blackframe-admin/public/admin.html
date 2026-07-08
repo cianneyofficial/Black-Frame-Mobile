@@ -72,9 +72,9 @@
 </div>
 
 <script>
-  // If already logged in, go straight to admin
+  // If already logged in, go straight to the admin dashboard
   if(localStorage.getItem("admin_logged")==="true"){
-    window.location.replace("/");
+    window.location.replace("/dashboard.html");
   }
 
   function doLogin(e){
@@ -83,7 +83,7 @@
     var errEl=document.getElementById("error-msg");
     if(pw==="admin123"){
       localStorage.setItem("admin_logged","true");
-      window.location.replace("/");
+      window.location.replace("/dashboard.html");
     }else{
       errEl.style.display="block";
       document.getElementById("password").value="";

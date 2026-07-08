@@ -9,9 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut } from "lucide-react";
 
 // ── Auth guard — runs before first render ─────────────────────────────────────
+// If not logged in and accessing /, redirect to the PUBLIC homepage (not admin login).
+// The admin login is reached explicitly via /admin.html in the nav.
 const isLoggedIn = localStorage.getItem("admin_logged") === "true";
 if (!isLoggedIn) {
-  window.location.replace("/admin.html");
+  window.location.replace("/index.html");
 }
 
 function App() {
