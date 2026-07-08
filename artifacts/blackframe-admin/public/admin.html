@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0b">
+  <title>Connexion Admin — BLACK FRAME MOBILE</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100svh;padding:24px}
+    .login-box{width:100%;max-width:380px;display:flex;flex-direction:column;gap:24px}
+    .login-logo{text-align:center}
+    .login-logo h1{font-size:26px;font-weight:900;letter-spacing:-.03em}
+    .login-logo h1 em{font-style:normal;color:var(--primary)}
+    .login-logo p{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:4px}
+    .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:28px 24px;display:flex;flex-direction:column;gap:20px}
+    .lock-icon{width:52px;height:52px;background:rgba(10,199,219,.1);border:1px solid rgba(10,199,219,.18);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto}
+    .lock-icon svg{width:24px;height:24px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .login-card h2{font-size:20px;font-weight:800;letter-spacing:-.02em;text-align:center}
+    .login-card .hint{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+    .pw-wrap{position:relative}
+    .pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;padding:4px;cursor:pointer;color:var(--muted);display:flex;align-items:center}
+    .pw-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+    .pw-toggle:active{color:var(--text)}
+    .back-link{text-align:center;font-size:13px;color:var(--muted)}
+    .back-link a{color:var(--primary);font-weight:600}
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="login-logo">
+    <h1>BLACK <em>FRAME</em></h1>
+    <p>Administration</p>
+  </div>
+
+  <div class="login-card">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <h2>Accès sécurisé</h2>
+    <p class="hint">Entrez le mot de passe administrateur pour accéder au tableau de bord.</p>
+
+    <div class="form-error" id="error-msg">
+      ❌ Mot de passe incorrect. Réessayez.
+    </div>
+
+    <form id="login-form" onsubmit="doLogin(event)" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="password">Mot de passe</label>
+        <div class="pw-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            autofocus
+          >
+          <button type="button" class="pw-toggle" onclick="togglePw()" aria-label="Voir le mot de passe">
+            <svg id="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:4px;height:52px;font-size:16px">
+        Se connecter
+      </button>
+    </form>
+  </div>
+
+  <p class="back-link"><a href="/index.html">← Retour au site</a></p>
+</div>
+
+<script>
+  // If already logged in, go straight to admin
+  if(localStorage.getItem("admin_logged")==="true"){
+    window.location.replace("/");
+  }
+
+  function doLogin(e){
+    e.preventDefault();
+    var pw=document.getElementById("password").value;
+    var errEl=document.getElementById("error-msg");
+    if(pw==="admin123"){
+      localStorage.setItem("admin_logged","true");
+      window.location.replace("/");
+    }else{
+      errEl.style.display="block";
+      document.getElementById("password").value="";
+      document.getElementById("password").focus();
+      // Shake the card
+      var card=document.querySelector(".login-card");
+      card.style.transition="transform .08s";
+      card.style.transform="translateX(-6px)";
+      setTimeout(function(){card.style.transform="translateX(6px)"},80);
+      setTimeout(function(){card.style.transform="translateX(0)"},160);
+    }
+  }
+
+  function togglePw(){
+    var input=document.getElementById("password");
+    input.type=input.type==="password"?"text":"password";
+  }
+</script>
+</body>
+</html>

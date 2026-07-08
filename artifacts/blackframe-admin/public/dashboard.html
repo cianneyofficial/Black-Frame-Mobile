@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard — BLACK FRAME MOBILE</title>
+  <style>
+    body{font-family:-apple-system,sans-serif;background:#0a0a0b;color:#f0f0f2;display:flex;align-items:center;justify-content:center;min-height:100svh;margin:0}
+    p{font-size:15px;color:rgba(255,255,255,.4)}
+  </style>
+  <script>
+    // Auth guard — matches the protection in the React admin App.tsx
+    if(localStorage.getItem("admin_logged")!=="true"){
+      window.location.replace("/admin.html");
+    }else{
+      // Redirect to the React admin SPA
+      window.location.replace("/");
+    }
+  </script>
+</head>
+<body>
+  <p>Chargement du tableau de bord…</p>
+</body>
+</html>

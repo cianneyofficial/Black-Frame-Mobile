@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0b">
+  <meta name="description" content="Tous nos téléphones disponibles — BLACK FRAME MOBILE.">
+  <title>Téléphones — BLACK FRAME MOBILE</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .shop-header{padding:32px 0 20px}
+    .shop-search{
+      position:relative;margin-top:16px;
+    }
+    .shop-search input{
+      width:100%;height:48px;background:rgba(255,255,255,.05);
+      border:1px solid var(--border);border-radius:var(--r-sm);
+      color:var(--text);font-size:15px;padding:0 16px 0 44px;outline:none;
+      transition:border .2s;
+    }
+    .shop-search input:focus{border-color:var(--primary)}
+    .shop-search input::placeholder{color:var(--muted)}
+    .shop-search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+    .count-label{font-size:13px;color:var(--muted);margin-top:12px}
+    .count-label strong{color:var(--text);font-weight:700}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/index.html" class="nav-logo">BLACK <em>FRAME</em></a>
+    <div class="nav-links">
+      <a href="/index.html">Accueil</a>
+      <a href="/shop.html" class="active">Téléphones</a>
+      <a href="/about.html">À propos</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/admin.html" class="admin-link">Admin</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="shop-header">
+    <p class="section-label">Notre stock</p>
+    <h1 class="section-title">Téléphones disponibles</h1>
+    <p class="section-sub">Tous nos appareils sont testés et vérifiés avant la vente.</p>
+    <div class="shop-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="search" placeholder="Rechercher un modèle…" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <p class="count-label"><strong id="count">0</strong> téléphone(s) disponible(s)</p>
+  </div>
+
+  <div class="phone-grid" id="phones-grid"></div>
+
+  <div class="empty" id="empty-state">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+    </div>
+    <h2>Aucun téléphone trouvé</h2>
+    <p id="empty-msg">Revenez bientôt ou contactez-nous.</p>
+    <a href="https://wa.me/33850406200?text=Bonjour%2C+avez-vous+des+t%C3%A9l%C3%A9phones+disponibles%20%3F" class="btn btn-wa" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Nous demander
+    </a>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>BLACK FRAME MOBILE</strong> · Lubumbashi</p>
+  <p><a href="/index.html">Accueil</a> · <a href="/contact.html">Contact</a></p>
+</footer>
+
+<script>
+var WA_NUM="33850406200";
+var WA_SVG='<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:#fff;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+var PHONE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="width:48px;height:48px"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+
+function fmt(n){return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",minimumFractionDigits:0}).format(n)}
+function daysSince(d){return Math.floor((Date.now()-new Date(d+"T00:00:00").getTime())/86400000)}
+function isNew(p){return daysSince(p.purchaseDate)<=7}
+function isGoodDeal(p){var c=p.purchasePrice+p.repairCost;return c>0&&(p.salePrice-c)>=50&&(p.salePrice-c)/c>=.20}
+function waLink(model,price){return"https://wa.me/"+WA_NUM+"?text="+encodeURIComponent("Bonjour, je suis intéressé par "+model+" à "+price+", est-il disponible ?")}
+
+function renderMedia(p){
+  var m=p.media;
+  if(!m||!m.length)return'<div class="phone-media-placeholder">'+PHONE_SVG+'</div>';
+  var f=m[0];
+  if(f.type==="video")return'<video src="'+f.src+'" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:contain"></video>';
+  return'<img src="'+f.src+'" alt="'+p.model+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">';
+}
+
+function phoneCard(p){
+  var price=fmt(p.salePrice);
+  var badges='<span class="badge badge-avail">Disponible</span>';
+  if(isNew(p))badges+='<span class="badge badge-new">Nouveau</span>';
+  if(isGoodDeal(p))badges+='<span class="badge badge-deal">🔥 Bonne affaire</span>';
+  var min=p.minPrice>0&&p.minPrice!==p.salePrice?'<span class="phone-price-min">min. '+fmt(p.minPrice)+'</span>':'';
+  var notes=p.notes?'<p class="phone-notes">'+p.notes.replace(/</g,'&lt;')+'</p>':'';
+  return'<div class="phone-card"><div class="phone-media">'+renderMedia(p)+'<div class="media-badges">'+badges+'</div></div><div class="phone-body"><p class="phone-model">'+p.model.replace(/</g,'&lt;')+'</p><p class="phone-price">'+price+min+'</p>'+notes+'</div><div class="phone-footer"><a href="'+waLink(p.model,price)+'" class="btn btn-wa btn-full" target="_blank" rel="noopener">'+WA_SVG+'Contacter sur WhatsApp</a></div></div>';
+}
+
+var allPhones=[];
+var query="";
+
+function load(){
+  try{allPhones=JSON.parse(localStorage.getItem("blackframe_phones")||"[]").filter(function(p){return p.status==="Disponible"})}catch(e){allPhones=[]}
+  allPhones.sort(function(a,b){
+    if(isNew(a)!==isNew(b))return isNew(a)?-1:1;
+    if(isGoodDeal(a)!==isGoodDeal(b))return isGoodDeal(a)?-1:1;
+    return new Date(b.purchaseDate).getTime()-new Date(a.purchaseDate).getTime();
+  });
+  render();
+}
+
+function render(){
+  var q=query.toLowerCase().trim();
+  var filtered=q?allPhones.filter(function(p){return p.model.toLowerCase().includes(q)||(p.notes&&p.notes.toLowerCase().includes(q))}):allPhones;
+  var grid=document.getElementById("phones-grid");
+  var empty=document.getElementById("empty-state");
+  var emptyMsg=document.getElementById("empty-msg");
+  document.getElementById("count").textContent=filtered.length;
+  if(filtered.length===0){
+    grid.innerHTML="";grid.style.display="none";empty.style.display="flex";
+    emptyMsg.textContent=q?"Aucun résultat pour \""+q+"\".":"Revenez bientôt ou contactez-nous.";
+  }else{
+    grid.innerHTML=filtered.map(phoneCard).join('');grid.style.display="grid";empty.style.display="none";
+  }
+}
+
+load();
+document.getElementById("search").addEventListener("input",function(e){query=e.target.value;render()});
+window.addEventListener("storage",function(e){if(e.key==="blackframe_phones"||e.key===null)load()});
+setInterval(load,5000);
+</script>
+</body>
+</html>
