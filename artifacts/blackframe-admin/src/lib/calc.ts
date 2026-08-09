@@ -25,14 +25,14 @@ export function daysSince(dateStr: string): number {
   );
 }
 
-export type Reco = "Très rentable" | "À vendre vite" | "Marge faible" | "OK";
+export type Reco = "Très rentable" | "À vendre rapidement" | "À éviter" | "OK";
 
 export function getReco(p: Phone): Reco {
   const prof = profit(p);
   const marg = marginPct(p);
   const days = daysSince(p.purchaseDate);
-  if (prof < 20_000) return "Marge faible";
-  if (days > 7) return "À vendre vite";
+  if (prof < 20_000) return "À éviter";
+  if (days > 7) return "À vendre rapidement";
   if (marg >= 40) return "Très rentable";
   return "OK";
 }

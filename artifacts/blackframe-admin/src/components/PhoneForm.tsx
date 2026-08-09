@@ -89,6 +89,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
   const purchasePrice = Number(watch("purchasePrice")) || 0;
   const repairCost = Number(watch("repairCost")) || 0;
   const salePrice = Number(watch("salePrice")) || 0;
+  const minPrice = Number(watch("minPrice")) || 0;
 
   const totalCost = purchasePrice + repairCost;
   const profit = salePrice - totalCost;
@@ -109,7 +110,7 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
     <div className="flex flex-col max-w-md mx-auto w-full px-4 pt-6 pb-40">
       <div className="mb-6">
         <h2 className="text-2xl font-bold">{initialData ? "Modifier" : "Ajouter"} un téléphone</h2>
-        <p className="text-xs text-muted-foreground mt-1">Tous les prix en Francs Congolais (CDF) · 1 $ = {rate.toLocaleString("fr-FR")} CDF</p>
+        <p className="text-xs text-muted-foreground mt-1">Tous les prix en CDF avec conversion automatique en dollars · 1 $ = {rate.toLocaleString("fr-FR")} CDF</p>
       </div>
 
       <Form {...form}>
@@ -312,6 +313,9 @@ export function PhoneForm({ initialData, onSubmit, onCancel }: PhoneFormProps) {
               )}
             />
           </div>
+          <p className="text-[11px] text-muted-foreground -mt-3">
+            Prix minimum actuel : {fmt(minPrice)} · {fmtUSD(minPrice)}
+          </p>
 
           {/* Notes */}
           <FormField

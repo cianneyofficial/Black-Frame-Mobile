@@ -138,6 +138,7 @@ export function StatsPanel({ phones }: StatsPanelProps) {
                 <p className="text-sm font-medium text-white truncate flex-1">{p.model}</p>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-bold text-red-400">{fmt(profit(p))}</p>
+                  <p className="text-[10px] text-red-400/60">{fmtUSD(Math.abs(profit(p)))}</p>
                   <p className="text-[10px] text-red-400/60">{marginPct(p).toFixed(0)}% marge</p>
                 </div>
               </div>
@@ -155,7 +156,7 @@ export function StatsPanel({ phones }: StatsPanelProps) {
               <p className="text-sm font-semibold text-orange-300">
                 🕒 {stalePhones.length} téléphone{stalePhones.length > 1 ? "s" : ""} en stock depuis + de {STALE_DAYS} jours
               </p>
-              <p className="text-[10px] text-orange-400/70 mt-0.5">À vendre en priorité</p>
+              <p className="text-[10px] text-orange-400/70 mt-0.5">Recommandation : À vendre rapidement</p>
             </div>
           </div>
           <div className="divide-y divide-orange-500/10">

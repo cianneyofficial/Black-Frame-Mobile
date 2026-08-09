@@ -127,8 +127,8 @@ export function SalesHistory({ phones }: SalesHistoryProps) {
 
                 {/* Details */}
                 <div className="grid grid-cols-4 gap-2 bg-black/30 rounded-xl p-3 border border-white/5">
-                  <MiniStat label="Vendu" value={fmt(p.salePrice)} />
-                  <MiniStat label="Coût" value={fmt(cost)} muted />
+                   <MiniStat label="Vendu" value={fmt(p.salePrice)} sub={fmtUSD(p.salePrice)} />
+                   <MiniStat label="Coût" value={fmt(cost)} sub={fmtUSD(cost)} muted />
                   <MiniStat
                     label="Marge"
                     value={marg.toFixed(0) + "%"}
@@ -177,11 +177,13 @@ function SummaryCard({
 function MiniStat({
   label,
   value,
+  sub,
   className = "text-white",
   muted = false,
 }: {
   label: string;
   value: string;
+  sub?: string;
   className?: string;
   muted?: boolean;
 }) {
@@ -189,6 +191,7 @@ function MiniStat({
     <div className="flex flex-col gap-0.5">
       <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{label}</span>
       <span className={`text-[11px] font-bold leading-tight ${muted ? "text-muted-foreground" : className}`}>{value}</span>
+      {sub && <span className="text-[10px] text-muted-foreground/60">{sub}</span>}
     </div>
   );
 }

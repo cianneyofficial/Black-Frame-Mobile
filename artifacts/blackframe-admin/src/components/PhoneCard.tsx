@@ -63,8 +63,8 @@ async function copyToClipboard(text: string): Promise<void> {
 
 const RECO_STYLE: Record<string, { bg: string; text: string; dot: string }> = {
   "Très rentable": { bg: "bg-green-500/15", text: "text-green-400", dot: "bg-green-400" },
-  "À vendre vite": { bg: "bg-orange-500/15", text: "text-orange-400", dot: "bg-orange-400" },
-  "Marge faible": { bg: "bg-red-500/15", text: "text-red-400", dot: "bg-red-400" },
+  "À vendre rapidement": { bg: "bg-orange-500/15", text: "text-orange-400", dot: "bg-orange-400" },
+  "À éviter": { bg: "bg-red-500/15", text: "text-red-400", dot: "bg-red-400" },
   "OK": { bg: "bg-white/5", text: "text-muted-foreground", dot: "bg-white/30" },
 };
 
@@ -143,8 +143,8 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${RECO_STYLE[reco].dot}`} />
               <span className={`text-xs font-semibold ${RECO_STYLE[reco].text}`}>
                 {reco === "Très rentable" && "🔥 "}
-                {reco === "À vendre vite" && "🕒 "}
-                {reco === "Marge faible" && "⚠️ "}
+                {reco === "À vendre rapidement" && "🕒 "}
+                {reco === "À éviter" && "⚠️ "}
                 {reco} · {days} jours en stock
               </span>
             </div>
@@ -153,7 +153,9 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
           {/* Below min price alert */}
           {belowMin && (
             <div className="flex items-center gap-2 bg-red-500/10 rounded-lg px-3 py-2 border border-red-500/20">
-              <span className="text-xs font-semibold text-red-400">⚠️ Prix vente &lt; prix minimum ({fmt(phone.minPrice)})</span>
+              <span className="text-xs font-semibold text-red-400">
+                ⚠️ Prix vente &lt; prix minimum ({fmt(phone.minPrice)} · {fmtUSD(phone.minPrice)})
+              </span>
             </div>
           )}
 
@@ -181,7 +183,7 @@ export function PhoneCard({ phone, onEdit, onDelete, onMarkSold }: PhoneCardProp
               <span className="text-sm text-muted-foreground font-medium">{fmtUSD(phone.salePrice)}</span>
             </div>
             {phone.minPrice > 0 && phone.minPrice !== phone.salePrice && (
-              <span className="text-xs text-muted-foreground">min. {fmt(phone.minPrice)}</span>
+              <span className="text-xs text-muted-foreground">min. {fmt(phone.minPrice)} · {fmtUSD(phone.minPrice)}</span>
             )}
           </div>
 

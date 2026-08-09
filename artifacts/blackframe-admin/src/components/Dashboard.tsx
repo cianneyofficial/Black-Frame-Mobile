@@ -57,7 +57,7 @@ export function Dashboard({ phones, onEdit, onDelete, onMarkSold }: DashboardPro
         <KPICard
           title="Vendus"
           value={String(sold.length)}
-          sub={sold.length > 0 ? `Moy. ${fmt(avgProfit)}` : "Aucune vente"}
+          sub={sold.length > 0 ? `Moy. ${fmt(avgProfit)} · ${fmtUSD(avgProfit)}` : "Aucune vente"}
         />
       </div>
 
