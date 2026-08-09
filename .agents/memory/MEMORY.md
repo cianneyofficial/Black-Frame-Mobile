@@ -1,0 +1,1 @@
+- [Admin/public contract checks](admin-public-contract-checks.md) — when admin and public share browser storage, validate both synchronized records and identical display/formatting rules.

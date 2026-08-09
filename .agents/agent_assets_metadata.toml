@@ -5,5 +5,5 @@ generated = []
 id = "YBLUh3--CAC_WHBlzmzdg"
 uri = "file://deliverables/black-frame-mobile-complete.zip"
 type = "unspecified"
-title = "BLACK FRAME MOBILE — projet complet"
-description = "Archive complète du projet avec l’admin commercial, la vitrine publique, les calculs CDF/USD, l’historique, les recommandations et le simulateur de prix."
+title = "BLACK FRAME MOBILE — archive finale synchronisée"
+description = "Version finale vérifiée avec synchronisation admin/vitrine, stock local partagé, taux CDF/USD commun, statuts disponibles/vendus et historique des ventes."
