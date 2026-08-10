@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: phones
+    description: Inventory contract for phones
+  - name: exchange-rates
+    description: Currency conversion contract
 paths:
   /healthz:
     get:
@@ -24,7 +28,143 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /phones:
+    get:
+      operationId: listPhones
+      tags: [phones]
+      summary: List phones
+      description: Returns phones from the future database-backed inventory.
+      responses:
+        "200":
+          description: Phone inventory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Phone"
+    post:
+      operationId: createPhone
+      tags: [phones]
+      summary: Create a phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhoneInput"
+      responses:
+        "201":
+          description: Created phone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Phone"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /phones/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PhoneId"
+    get:
+      operationId: getPhone
+      tags: [phones]
+      summary: Get a phone
+      responses:
+        "200":
+          description: Phone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Phone"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updatePhone
+      tags: [phones]
+      summary: Update a phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhoneUpdate"
+      responses:
+        "200":
+          description: Updated phone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Phone"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deletePhone
+      tags: [phones]
+      summary: Delete a phone
+      responses:
+        "204":
+          description: Phone deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /phones/{id}/sold:
+    parameters:
+      - $ref: "#/components/parameters/PhoneId"
+    post:
+      operationId: markPhoneSold
+      tags: [phones]
+      summary: Mark a phone as sold
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkSoldInput"
+      responses:
+        "200":
+          description: Sold phone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Phone"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /exchange-rates/current:
+    get:
+      operationId: getCurrentExchangeRate
+      tags: [exchange-rates]
+      summary: Get the current exchange rate
+      responses:
+        "200":
+          description: Current CDF/USD exchange rate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeRate"
 components:
+  parameters:
+    PhoneId:
+      name: id
+      in: path
+      required: true
+      description: Database phone ID or migration-resolved phone ID
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +173,197 @@ components:
           type: string
       required:
         - status
+    PhoneStatus:
+      type: string
+      enum: [Disponible, Réservé, Vendu]
+    PhoneMedia:
+      type: object
+      required: [id, phoneId, type, url, filename, createdAt]
+      properties:
+        id:
+          type: string
+        phoneId:
+          type: string
+        type:
+          type: string
+          enum: [image, video]
+        url:
+          type: string
+          minLength: 1
+        filename:
+          type: string
+          minLength: 1
+        createdAt:
+          type: string
+          format: date-time
+    PhoneMediaInput:
+      type: object
+      required: [type, url, filename]
+      properties:
+        type:
+          type: string
+          enum: [image, video]
+        url:
+          type: string
+          minLength: 1
+        filename:
+          type: string
+          minLength: 1
+    Phone:
+      type: object
+      required:
+        - id
+        - model
+        - purchasePrice
+        - repairCost
+        - salePrice
+        - minimumPrice
+        - status
+        - purchaseDate
+        - soldDate
+        - notes
+        - media
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+          minLength: 1
+        purchasePrice:
+          type: number
+          minimum: 0
+        repairCost:
+          type: number
+          minimum: 0
+        salePrice:
+          type: number
+          minimum: 0
+        minimumPrice:
+          type: number
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/PhoneStatus"
+        purchaseDate:
+          type: string
+          format: date
+        soldDate:
+          type: ["string", "null"]
+          format: date
+        notes:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhoneMedia"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    PhoneInput:
+      type: object
+      required:
+        - model
+        - purchasePrice
+        - repairCost
+        - salePrice
+        - minimumPrice
+        - status
+        - purchaseDate
+        - notes
+      properties:
+        model:
+          type: string
+          minLength: 1
+        purchasePrice:
+          type: number
+          minimum: 0
+        repairCost:
+          type: number
+          minimum: 0
+        salePrice:
+          type: number
+          minimum: 0
+        minimumPrice:
+          type: number
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/PhoneStatus"
+        purchaseDate:
+          type: string
+          format: date
+        soldDate:
+          type: ["string", "null"]
+          format: date
+        notes:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhoneMediaInput"
+    PhoneUpdate:
+      type: object
+      properties:
+        model:
+          type: string
+          minLength: 1
+        purchasePrice:
+          type: number
+          minimum: 0
+        repairCost:
+          type: number
+          minimum: 0
+        salePrice:
+          type: number
+          minimum: 0
+        minimumPrice:
+          type: number
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/PhoneStatus"
+        purchaseDate:
+          type: string
+          format: date
+        soldDate:
+          type: ["string", "null"]
+          format: date
+        notes:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhoneMediaInput"
+    MarkSoldInput:
+      type: object
+      properties:
+        soldDate:
+          type: string
+          format: date
+    ExchangeRate:
+      type: object
+      required: [id, currencyFrom, currencyTo, rate, updatedAt]
+      properties:
+        id:
+          type: string
+        currencyFrom:
+          type: string
+          minLength: 3
+        currencyTo:
+          type: string
+          minLength: 3
+        rate:
+          type: number
+          exclusiveMinimum: 0
+        updatedAt:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
 

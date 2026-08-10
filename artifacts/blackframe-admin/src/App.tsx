@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DataBackupPanel } from "@/components/DataBackupPanel";
 
 // ── Auth guard — runs before first render ─────────────────────────────────────
 const isLoggedIn = localStorage.getItem("admin_logged") === "true";
@@ -124,6 +125,7 @@ function AdminApp() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 mt-2">
+            <DataBackupPanel />
             <div className="flex flex-col gap-2">
               <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                 1 USD = ? CDF

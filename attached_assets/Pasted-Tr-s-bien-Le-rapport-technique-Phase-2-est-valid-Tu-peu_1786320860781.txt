@@ -1,0 +1,265 @@
+Très bien. Le rapport technique Phase 2 est validé.
+
+Tu peux maintenant commencer uniquement par :
+
+PHASE A — SAUVEGARDE, MIGRATION ET ARCHITECTURE
+
+⚠️ IMPORTANT :
+Ne passe PAS encore à la création des tables PostgreSQL métier.
+Ne connecte PAS encore le dashboard à l'API.
+Ne remplace PAS encore localStorage.
+Ne modifie PAS encore l'authentification.
+Ne modifie PAS encore le site public.
+
+Cette phase doit préparer la migration sans aucune régression.
+
+1. POINT DE RESTAURATION
+
+Utilise le point de restauration Git existant "gitsafe-backup" comme référence de sécurité.
+
+Vérifie qu'il correspond bien à l'état actuel du projet.
+
+Ne supprime rien.
+
+2. SAUVEGARDE DES DONNÉES
+
+Crée un système permettant d'exporter les données actuellement présentes dans :
+
+"localStorage["blackframe_phones"]"
+
+et :
+
+"localStorage["blackframe_rate"]"
+
+Créer une sauvegarde JSON structurée contenant :
+
+- phones
+- exchange rate
+- date d'export
+- version du format
+
+Exemple conceptuel :
+
+{
+"version": 1,
+"exportedAt": "...",
+"exchangeRate": 2500,
+"phones": [...]
+}
+
+⚠️ Ne supprime aucune donnée du navigateur après l'export.
+
+3. VALIDATEUR DE MIGRATION
+
+Créer un validateur Zod pour vérifier les anciennes données.
+
+Il doit détecter :
+
+- données invalides
+- champs manquants
+- prix invalides
+- statuts inconnus
+- dates invalides
+- médias invalides
+- doublons d'identifiants
+
+Le validateur doit produire un rapport clair :
+
+- nombre total
+- valides
+- invalides
+- doublons
+- erreurs
+
+4. FUTUR FORMAT DATABASE
+
+Prépare uniquement le contrat de données destiné à PostgreSQL.
+
+Pour "phones", définir clairement :
+
+- id
+- model
+- purchasePrice
+- repairCost
+- salePrice
+- minimumPrice
+- status
+- purchaseDate
+- soldDate
+- notes
+- createdAt
+- updatedAt
+
+Pour les médias :
+
+- id
+- phoneId
+- type
+- url
+- filename
+- createdAt
+
+Pour le taux :
+
+- id
+- currencyFrom
+- currencyTo
+- rate
+- updatedAt
+
+Pour les paramètres :
+
+- key
+- value
+- updatedAt
+
+⚠️ À ce stade, prépare uniquement les contrats/types et la documentation.
+
+Ne pousse encore aucune table en production.
+
+5. COMPATIBILITÉ ANCIEN FORMAT → FUTUR FORMAT
+
+Créer une fonction de transformation :
+
+legacyPhone → databasePhone
+
+Elle doit notamment convertir :
+
+"minPrice" → "minimumPrice"
+
+"media[].src" → futur système média
+
+"date de vente" → "soldDate"
+
+tout en conservant les données existantes.
+
+Ne perds aucune information.
+
+6. CONTRAT API
+
+Prépare le contrat OpenAPI initial pour :
+
+GET /api/healthz
+
+GET /api/phones
+
+GET /api/phones/:id
+
+POST /api/phones
+
+PATCH /api/phones/:id
+
+DELETE /api/phones/:id
+
+POST /api/phones/:id/sold
+
+GET /api/exchange-rates/current
+
+Ne branche PAS encore le frontend sur ces routes.
+
+Le contrat doit être cohérent avec Zod et les futurs types TypeScript.
+
+7. IDENTIFIANTS
+
+Analyse les identifiants actuels des téléphones.
+
+Détermine une stratégie fiable pour les identifiants PostgreSQL.
+
+Ne remplace pas les IDs existants sans prévoir une correspondance permettant la migration.
+
+8. MÉDIAS
+
+Analyse précisément comment les images et vidéos sont actuellement stockées.
+
+Documente :
+
+- type
+- taille potentielle
+- format
+- structure
+- emplacement
+- limites localStorage
+
+Pour cette phase, ne migre pas encore les fichiers.
+
+Prépare seulement l'architecture "StorageService".
+
+9. AUTHENTIFICATION
+
+Ne remplace pas encore l'authentification.
+
+Documente précisément :
+
+- fonctionnement actuel
+- points faibles
+- routes à protéger
+- stratégie recommandée
+- impact sur le dashboard
+
+La migration d'authentification sera une phase séparée.
+
+10. RESTAURATION
+
+Créer une procédure permettant de restaurer les données exportées dans localStorage en cas de problème.
+
+La restauration doit :
+
+- valider le JSON
+- afficher un aperçu
+- demander confirmation
+- restaurer les données
+- ne pas écraser automatiquement sans confirmation
+
+11. TESTS
+
+Après cette phase, vérifie :
+
+- le site public fonctionne comme avant
+- le dashboard fonctionne comme avant
+- les calculs fonctionnent
+- CDF/USD fonctionne
+- les téléphones fonctionnent
+- les médias fonctionnent
+- le build fonctionne
+- le typecheck fonctionne
+- aucune erreur console critique
+- aucune donnée existante n'a été supprimée
+
+12. RAPPORT FINAL DE PHASE A
+
+À la fin, donne-moi :
+
+1. Sauvegarde créée
+2. Format JSON créé
+3. Nombre de téléphones détectés
+4. Nombre de données valides
+5. Nombre d'erreurs
+6. Nombre de doublons
+7. Structure legacy identifiée
+8. Structure PostgreSQL proposée
+9. Contrat API préparé
+10. Stratégie d'identifiants
+11. Stratégie médias
+12. Stratégie authentification
+13. Procédure de restauration
+14. Fichiers créés
+15. Fichiers modifiés
+16. Tests effectués
+17. Résultats des tests
+18. Risques restants
+
+⚠️ CRITÈRE IMPORTANT :
+
+À la fin de cette phase :
+
+PostgreSQL peut rester vierge.
+
+localStorage doit continuer à fonctionner exactement comme avant.
+
+Le site doit rester opérationnel.
+
+Aucune fonctionnalité existante ne doit être cassée.
+
+Une fois cette Phase A terminée, ARRÊTE-TOI et attends ma validation avant de commencer la Phase B — PostgreSQL + Drizzle.
+
+Ne passe pas automatiquement à la phase suivante.
